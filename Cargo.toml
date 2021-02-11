@@ -13,3 +13,7 @@ keywords = ["terminal", "cli", "header", "title", "console", "banners"]
 categories = ["command-line-utilities", "command-line-interface", "development-tools", "development-tools::debugging", "config"]
 
 [dependencies]
+
+[lib]
+name = "banner"
+path = "src/lib.rs"
