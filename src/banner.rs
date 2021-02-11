@@ -1,10 +1,12 @@
+mod border;
+
 use colored::*;
-use super::banner_border::BannerBorder;
+use border::Border;
 
 pub struct Banner {
-    pub border: BannerBorder,
+    pub border: Border,
     pub lines: Vec<BannerLine>,
-    pub width: usize
+    pub width: u8
 }
 
 impl Banner {
@@ -13,7 +15,9 @@ impl Banner {
      */
     pub fn new() -> Banner {
         return Banner {
-            border: BannerBorder::new()
+            border: Border::new(),
+            lines: Vec::new(),
+            width: 50
         }
     }
 
@@ -24,10 +28,31 @@ impl Banner {
         self.border.is_visible = false;
     }
 
+    /**
+     * Prints the banner.
+     */
     pub fn print(self: &Banner) {
+        println!("{}", self.format());
+    }
+
+    /**
+     * Formats the banner to a colored string.
+     */
+    pub fn format(self: &Banner) -> String {
+        let top = self.border.fmt_top(self.width);
+        let bottom = self.border.fmt_bottom(self.width);
+        let left = self.border.fmt_left();
+        let right = self.border.fmt_right();
+
+        let mut result: String;
+        
+        result = format!("{}\r\n", top);
         for line in self.lines.iter() {
-            line.print(self.width);
+            result.push_str(&format!("{}", line.format(&left, &right, self.width))[..]);
         }
+        result.push_str(&format!("{}\r\n", bottom)[..]);
+
+        result
     }
 }
 
@@ -50,27 +75,45 @@ impl BannerLine {
         }
     }
 
-    pub fn print(self: &BannerLine, panel_width: usize) {
-        let edge = "│".green();
-        let mut col: usize;
+    pub fn format(self: &BannerLine, left: &String, right: &String, panel_width: u8) -> String {
+        let mut result: String;
+        let mut col: u8;
     
         // Print left edge plus one space (col: 2)
-        print!("{} ", edge);
+        result = format!("{} ", left);
         col = 1;
     
         // Print parts
         for part in self.parts.iter() {
-            print!("{}", part.text.color(&part.color[..]));
-            col = col + part.text.len();
+            result.push_str(&format!("{}", part.text.color(&part.color[..]))[..]);
+            col = col + part.text.len() as u8;
         }
     
         // Print remaining space
-        print!("{}", (col..panel_width).map(|_| " ").collect::<String>());
-        println!("{}", edge);
+        result.push_str(&format!("{}", (col..panel_width).map(|_| " ").collect::<String>())[..]);
+        result.push_str(&format!("{}", right)[..]);
+
+        result
     }
 }
 
 pub struct BannerPart {
     text: String,
     color: String
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fmt_default_empty() {
+        let mut banner: Banner = Banner::new();
+        banner.width = 4;
+        let expected = 
+            format!("{}\r\n{}\r\n", 
+                "┌──┐".color(banner.border.color.to_string()),
+                "└──┘".color(banner.border.color.to_string()));
+        assert_eq!(expected, banner.format());
+    }
 }
