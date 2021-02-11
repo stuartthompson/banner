@@ -13,6 +13,7 @@ keywords = ["terminal", "cli", "header", "title", "console", "banners"]
 categories = ["command-line-utilities", "command-line-interface", "development-tools", "development-tools::debugging", "config"]
 
 [dependencies]
+colored = "1.9"
 
 [lib]
 name = "banner"
