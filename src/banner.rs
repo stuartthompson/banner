@@ -1,5 +1,6 @@
 mod border;
 mod content;
+mod style;
 
 use border::Border;
 use content::{Line, TextLine};
