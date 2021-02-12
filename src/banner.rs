@@ -1,12 +1,13 @@
 mod border;
+mod content;
 
-use colored::*;
 use border::Border;
+use content::{Line, TextLine};
 
 pub struct Banner {
     pub border: Border,
-    pub lines: Vec<BannerLine>,
-    pub width: u8
+    pub lines: Vec<Box<dyn Line>>,
+    pub width: u8,
 }
 
 impl Banner {
@@ -17,8 +18,8 @@ impl Banner {
         return Banner {
             border: Border::new(),
             lines: Vec::new(),
-            width: 50
-        }
+            width: 50,
+        };
     }
 
     /**
@@ -28,27 +29,43 @@ impl Banner {
         self.border.is_visible = false;
     }
 
+    pub fn add_text_line(&mut self, line: TextLine) {
+        self.lines.push(Box::new(line));
+    }
+
     /**
      * Prints the banner.
      */
     pub fn print(self: &Banner) {
-        println!("{}", self.format());
+        println!("{}", self.assemble());
     }
 
     /**
-     * Formats the banner to a colored string.
+     * Assembles the banner.
      */
-    pub fn format(self: &Banner) -> String {
+    pub fn assemble(self: &Banner) -> String {
         let top = self.border.fmt_top(self.width);
         let bottom = self.border.fmt_bottom(self.width);
         let left = self.border.fmt_left();
         let right = self.border.fmt_right();
 
         let mut result: String;
-        
         result = format!("{}\r\n", top);
         for line in self.lines.iter() {
-            result.push_str(&format!("{}", line.format(&left, &right, self.width))[..]);
+            let l = &(*line).fmt();
+            // Add left border
+            result.push_str(&left);
+            // Add line content
+            result.push_str(&format!("{}", l)[..]);
+            // Add whitespace to end
+            result.push_str(&format!(
+                "{}",
+                (l.len() + 1..self.width as usize - 1)
+                    .map(|_| " ")
+                    .collect::<String>()
+            ));
+            // Add right border
+            result.push_str(&right);
         }
         result.push_str(&format!("{}\r\n", bottom)[..]);
 
@@ -56,64 +73,29 @@ impl Banner {
     }
 }
 
-pub struct BannerLine {
-    parts: Vec<BannerPart>
-}
-
-impl BannerLine {
-    pub fn build_key_value(
-        key_text: &str, 
-        key_color: &str, 
-        value_text: &str, 
-        value_color: &str
-    ) -> BannerLine {
-        return BannerLine { 
-            parts: vec![
-                BannerPart { text: String::from(key_text), color: String::from(key_color) },
-                BannerPart { text: String::from(value_text), color: String::from(value_color) }
-            ]
-        }
-    }
-
-    pub fn format(self: &BannerLine, left: &String, right: &String, panel_width: u8) -> String {
-        let mut result: String;
-        let mut col: u8;
-    
-        // Print left edge plus one space (col: 2)
-        result = format!("{} ", left);
-        col = 1;
-    
-        // Print parts
-        for part in self.parts.iter() {
-            result.push_str(&format!("{}", part.text.color(&part.color[..]))[..]);
-            col = col + part.text.len() as u8;
-        }
-    
-        // Print remaining space
-        result.push_str(&format!("{}", (col..panel_width).map(|_| " ").collect::<String>())[..]);
-        result.push_str(&format!("{}", right)[..]);
-
-        result
-    }
-}
-
-pub struct BannerPart {
-    text: String,
-    color: String
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
     #[test]
     fn test_fmt_default_empty() {
         let mut banner: Banner = Banner::new();
         banner.width = 4;
-        let expected = 
-            format!("{}\r\n{}\r\n", 
-                "┌──┐".color(banner.border.color.to_string()),
-                "└──┘".color(banner.border.color.to_string()));
-        assert_eq!(expected, banner.format());
+        let expected = format!("{}", "\u{1b}[37m┌──┐\u{1b}[0m\r\n\u{1b}[37m└──┘\u{1b}[0m\r\n");
+        assert_eq!(expected, banner.assemble());
+    }
+
+    #[test]
+    fn test_fmt_single_text_line() {
+        // Build the banner
+        let mut banner: Banner = Banner::new();
+        banner.width = 16;
+        banner.add_text_line(content::TextLine::new(String::from("Hello!")));
+
+        // Build the expected output
+        let expected = format!(
+            "{}", "\u{1b}[37m┌──────────────┐\u{1b}[0m\r\n\u{1b}[37m│\u{1b}[0mHello!        \u{1b}[37m│\u{1b}[0m\u{1b}[37m└──────────────┘\u{1b}[0m\r\n"
+        );
+
+        assert_eq!(expected, banner.assemble());
     }
 }

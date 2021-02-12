@@ -1,6 +1,6 @@
 use crate::colors::Color;
 
-use colored::*;
+use colored::Colorize;
 
 /**
  * Describes the glyphs used to render the border.
@@ -65,28 +65,6 @@ impl Border {
     }
 
     /**
-     * Creates a new banner border with a specific color.
-     */
-    pub fn new_with_color(color: Color) -> Border {
-        return Border {
-            color: color,
-            is_visible: true,
-            glyphs: BorderGlyphs::new(),
-        };
-    }
-
-    /**
-     * Creates a new banner border with a specific color and glyph descriptor.
-     */
-    pub fn new_with_color_and_glyphs(color: Color, glyphs: BorderGlyphs) -> Border {
-        return Border {
-            color: color,
-            is_visible: true,
-            glyphs: glyphs,
-        };
-    }
-
-    /**
      * Formats the border top as a colored string.
      */
     pub fn fmt_top(self: &Border, width: u8) -> String {
@@ -146,9 +124,12 @@ mod tests {
         let border: Border = Border::new();
         let expected = format!(
             "{}{}{}",
-            DEFAULT_TOP_LEFT_CHAR, (0..2).map(|_| DEFAULT_TOP_CHAR).collect::<String>(), DEFAULT_TOP_RIGHT_CHAR
+            DEFAULT_TOP_LEFT_CHAR,
+            (0..2).map(|_| DEFAULT_TOP_CHAR).collect::<String>(),
+            DEFAULT_TOP_RIGHT_CHAR
         )
-        .color(border.color.to_string()).to_string();
+        .color(border.color.to_string())
+        .to_string();
         assert_eq!(expected, border.fmt_top(4));
     }
 
@@ -157,23 +138,36 @@ mod tests {
         let border: Border = Border::new();
         let expected = format!(
             "{}{}{}",
-            DEFAULT_BOTTOM_LEFT_CHAR, (0..2).map(|_| DEFAULT_BOTTOM_CHAR).collect::<String>(), DEFAULT_BOTTOM_RIGHT_CHAR
+            DEFAULT_BOTTOM_LEFT_CHAR,
+            (0..2).map(|_| DEFAULT_BOTTOM_CHAR).collect::<String>(),
+            DEFAULT_BOTTOM_RIGHT_CHAR
         )
-        .color(border.color.to_string()).to_string();
+        .color(border.color.to_string())
+        .to_string();
         assert_eq!(expected, border.fmt_bottom(4));
     }
 
     #[test]
     fn test_fmt_left() {
         let border: Border = Border::new();
-        let expected = format!("{}", DEFAULT_LEFT_CHAR.to_string().color(border.color.to_string()));
+        let expected = format!(
+            "{}",
+            DEFAULT_LEFT_CHAR
+                .to_string()
+                .color(border.color.to_string())
+        );
         assert_eq!(expected, border.fmt_left());
     }
 
     #[test]
     fn test_fmt_right() {
         let border: Border = Border::new();
-        let expected = format!("{}", DEFAULT_RIGHT_CHAR.to_string().color(border.color.to_string()));
+        let expected = format!(
+            "{}",
+            DEFAULT_RIGHT_CHAR
+                .to_string()
+                .color(border.color.to_string())
+        );
         assert_eq!(expected, border.fmt_right());
     }
 }
