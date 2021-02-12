@@ -13,8 +13,17 @@ pub struct BorderGlyphs {
     top: char,
     left: char,
     right: char,
-    bottom: char
+    bottom: char,
 }
+
+const DEFAULT_TOP_LEFT_CHAR: char = '┌';
+const DEFAULT_TOP_RIGHT_CHAR: char = '┐';
+const DEFAULT_BOTTOM_LEFT_CHAR: char = '└';
+const DEFAULT_BOTTOM_RIGHT_CHAR: char = '┘';
+const DEFAULT_TOP_CHAR: char = '─';
+const DEFAULT_LEFT_CHAR: char = '│';
+const DEFAULT_RIGHT_CHAR: char = '│';
+const DEFAULT_BOTTOM_CHAR: char = '─';
 
 impl BorderGlyphs {
     /**
@@ -22,15 +31,15 @@ impl BorderGlyphs {
      */
     pub fn new() -> BorderGlyphs {
         return BorderGlyphs {
-            top_left: '┌',
-            top_right: '┐',
-            bottom_left: '└',
-            bottom_right: '┘',
-            top: '─',
-            left: '│',
-            right: '│',
-            bottom: '─'
-        }
+            top_left: DEFAULT_TOP_LEFT_CHAR,
+            top_right: DEFAULT_TOP_RIGHT_CHAR,
+            bottom_left: DEFAULT_BOTTOM_LEFT_CHAR,
+            bottom_right: DEFAULT_BOTTOM_RIGHT_CHAR,
+            top: DEFAULT_TOP_CHAR,
+            left: DEFAULT_LEFT_CHAR,
+            right: DEFAULT_RIGHT_CHAR,
+            bottom: DEFAULT_BOTTOM_CHAR,
+        };
     }
 }
 
@@ -40,7 +49,7 @@ impl BorderGlyphs {
 pub struct Border {
     pub color: Color,
     pub is_visible: bool,
-    pub glyphs: BorderGlyphs
+    pub glyphs: BorderGlyphs,
 }
 
 impl Border {
@@ -51,34 +60,29 @@ impl Border {
         return Border {
             color: Color::White,
             is_visible: true,
-            glyphs: BorderGlyphs::new()
+            glyphs: BorderGlyphs::new(),
         };
     }
 
     /**
      * Creates a new banner border with a specific color.
      */
-    pub fn new_with_color(
-        color: Color
-    ) -> Border {
+    pub fn new_with_color(color: Color) -> Border {
         return Border {
             color: color,
             is_visible: true,
-            glyphs: BorderGlyphs::new()
+            glyphs: BorderGlyphs::new(),
         };
     }
 
     /**
      * Creates a new banner border with a specific color and glyph descriptor.
      */
-    pub fn new_with_color_and_glyphs(
-        color: Color,
-        glyphs: BorderGlyphs
-    ) -> Border {
+    pub fn new_with_color_and_glyphs(color: Color, glyphs: BorderGlyphs) -> Border {
         return Border {
             color: color,
             is_visible: true,
-            glyphs: glyphs
+            glyphs: glyphs,
         };
     }
 
@@ -86,36 +90,50 @@ impl Border {
      * Formats the border top as a colored string.
      */
     pub fn fmt_top(self: &Border, width: u8) -> String {
-        format!("{}{}{}", 
-            self.glyphs.top_left, 
-            (1..width-1).map(|_| self.glyphs.top).collect::<String>(), 
-            self.glyphs.top_right.to_string())
-            .color(self.color.to_string()).to_string()
+        format!(
+            "{}{}{}",
+            self.glyphs.top_left,
+            (1..width - 1).map(|_| self.glyphs.top).collect::<String>(),
+            self.glyphs.top_right.to_string()
+        )
+        .color(self.color.to_string())
+        .to_string()
     }
 
     /**
      * Formats the border bottom as a colored string.
      */
     pub fn fmt_bottom(self: &Border, width: u8) -> String {
-        format!("{}{}{}", 
-            self.glyphs.bottom_left, 
-            (1..width-1).map(|_| self.glyphs.bottom).collect::<String>(), 
-            self.glyphs.bottom_right)
-            .color(self.color.to_string()).to_string()
+        format!(
+            "{}{}{}",
+            self.glyphs.bottom_left,
+            (1..width - 1)
+                .map(|_| self.glyphs.bottom)
+                .collect::<String>(),
+            self.glyphs.bottom_right
+        )
+        .color(self.color.to_string())
+        .to_string()
     }
 
     /**
      * Formats the border left-side as a colored string.
      */
     pub fn fmt_left(self: &Border) -> String {
-        format!("{}", String::from(self.glyphs.left).color(self.color.to_string()))
+        format!(
+            "{}",
+            String::from(self.glyphs.left).color(self.color.to_string())
+        )
     }
 
     /**
      * Formats the border right-side as a colored string.
      */
     pub fn fmt_right(self: &Border) -> String {
-        format!("{}", String::from(self.glyphs.right).color(self.color.to_string()))
+        format!(
+            "{}",
+            String::from(self.glyphs.right).color(self.color.to_string())
+        )
     }
 }
 
@@ -126,7 +144,11 @@ mod tests {
     #[test]
     fn test_fmt_top() {
         let border: Border = Border::new();
-        let expected = format!("{}", "┌──┐".color(border.color.to_string()));
+        let expected = format!(
+            "{}{}{}",
+            DEFAULT_TOP_LEFT_CHAR, DEFAULT_TOP_CHAR, DEFAULT_TOP_RIGHT_CHAR
+        )
+        .color(border.color.to_string());
         assert_eq!(expected, border.fmt_top(4));
     }
 
