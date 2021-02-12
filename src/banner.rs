@@ -1,14 +1,14 @@
-mod border;
 mod content;
 mod style;
 
-use border::Border;
+use colored::Colorize;
 use content::{Line, TextLine};
+use style::Style;
 
 pub struct Banner {
-    pub border: Border,
-    pub lines: Vec<Box<dyn Line>>,
     pub width: u8,
+    style: Style,
+    lines: Vec<Box<dyn Line>>,
 }
 
 impl Banner {
@@ -17,19 +17,15 @@ impl Banner {
      */
     pub fn new() -> Banner {
         return Banner {
-            border: Border::new(),
-            lines: Vec::new(),
             width: 50,
+            style: Style::new(),
+            lines: Vec::new(),
         };
     }
 
     /**
-     * Hides the banner border.
+     * Adds a line of text to the banner.
      */
-    pub fn hide_border(&mut self) {
-        self.border.is_visible = false;
-    }
-
     pub fn add_text_line(&mut self, line: TextLine) {
         self.lines.push(Box::new(line));
     }
@@ -45,17 +41,12 @@ impl Banner {
      * Assembles the banner.
      */
     pub fn assemble(self: &Banner) -> String {
-        let top = self.border.fmt_top(self.width);
-        let bottom = self.border.fmt_bottom(self.width);
-        let left = self.border.fmt_left();
-        let right = self.border.fmt_right();
-
         let mut result: String;
-        result = format!("{}\r\n", top);
+        result = format!("{}\r\n", self.fmt_border_top());
         for line in self.lines.iter() {
             let l = &(*line).fmt();
             // Add left border
-            result.push_str(&left);
+            result.push_str(&self.fmt_border_left());
             // Add line content
             result.push_str(&format!("{}", l)[..]);
             // Add whitespace to end
@@ -66,10 +57,74 @@ impl Banner {
                     .collect::<String>()
             ));
             // Add right border
-            result.push_str(&right);
+            result.push_str(&self.fmt_border_right());
         }
-        result.push_str(&format!("{}\r\n", bottom)[..]);
+        result.push_str(&format!("{}\r\n", self.fmt_border_bottom())[..]);
 
+        result
+    }
+
+    /**
+     * Formats the border top as a colored string.
+     */
+    pub fn fmt_border_top(self: &Banner) -> String {
+        let style = &self.style.border;
+        let mut result: String = format!(
+            "{}{}{}",
+            style.glyphs.top_left,
+            (1..self.width - 1).map(|_| style.glyphs.top).collect::<String>(),
+            style.glyphs.top_right.to_string()
+        );
+        // Apply color (if not monochrome styled)
+        if !self.style.is_monochrome {
+            result = result.color(style.color.to_string()).to_string();
+        }
+        result
+    }
+
+    /**
+     * Formats the border bottom as a colored string.
+     */
+    fn fmt_border_bottom(self: &Banner) -> String {
+        let style = &self.style.border;
+        let mut result: String = format!(
+            "{}{}{}",
+            style.glyphs.bottom_left,
+            (1..self.width - 1)
+                .map(|_| style.glyphs.bottom)
+                .collect::<String>(),
+            style.glyphs.bottom_right
+        );
+        // Apply color (if not monochrome styled)
+        if !self.style.is_monochrome {
+            result = result.color(style.color.to_string()).to_string();
+        }
+        result
+    }
+
+    /**
+     * Formats the border left-side as a colored string.
+     */
+    fn fmt_border_left(self: &Banner) -> String {
+        let style = &self.style.border;
+        let mut result: String = String::from(style.glyphs.left);
+        // Apply color (if not monochrome styled)
+        if !self.style.is_monochrome {
+            result = result.color(style.color.to_string()).to_string();
+        }
+        result
+    }
+
+    /**
+     * Formats the border right-side as a colored string.
+     */
+    fn fmt_border_right(self: &Banner) -> String {
+        let style = &self.style.border;
+        let mut result: String = String::from(style.glyphs.right);
+        // Apply color (if not monochrome styled)
+        if !self.style.is_monochrome {
+            result = result.color(style.color.to_string()).to_string();
+        }
         result
     }
 }
@@ -81,7 +136,11 @@ mod tests {
     fn test_fmt_default_empty() {
         let mut banner: Banner = Banner::new();
         banner.width = 4;
-        let expected = format!("{}", "\u{1b}[37m┌──┐\u{1b}[0m\r\n\u{1b}[37m└──┘\u{1b}[0m\r\n");
+        banner.style.is_monochrome = true;
+        let expected = format!(
+            "{}",
+            "┌──┐\r\n└──┘\r\n"
+        );
         assert_eq!(expected, banner.assemble());
     }
 
@@ -94,7 +153,7 @@ mod tests {
 
         // Build the expected output
         let expected = format!(
-            "{}", "\u{1b}[37m┌──────────────┐\u{1b}[0m\r\n\u{1b}[37m│\u{1b}[0mHello!        \u{1b}[37m│\u{1b}[0m\u{1b}[37m└──────────────┘\u{1b}[0m\r\n"
+            "{}", "┌──────────────┐\r\n│Hello!        │└──────────────┘\r\n"
         );
 
         assert_eq!(expected, banner.assemble());
