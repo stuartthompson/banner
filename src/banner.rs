@@ -1,9 +1,11 @@
 mod content;
 mod style;
+mod border_painter;
 
 use colored::Colorize;
+use border_painter::BorderPainter;
 use content::{Line, TextLine};
-use style::Style;
+use style::{Style};
 
 pub struct Banner {
     pub width: u8,
@@ -41,12 +43,17 @@ impl Banner {
      * Assembles the banner.
      */
     pub fn assemble(self: &Banner) -> String {
+        let border_painter: BorderPainter = BorderPainter::new(
+            &self.style.border, 
+            self.style.is_monochrome, 
+            self.width);
+
         let mut result: String;
-        result = format!("{}\r\n", self.fmt_border_top());
+        result = format!("{}\r\n", border_painter.top());
         for line in self.lines.iter() {
             let l = &(*line).fmt();
             // Add left border
-            result.push_str(&self.fmt_border_left());
+            result.push_str(&border_painter.left());
             // Add line content
             result.push_str(&format!("{}", l)[..]);
             // Add whitespace to end
@@ -57,74 +64,10 @@ impl Banner {
                     .collect::<String>()
             ));
             // Add right border
-            result.push_str(&self.fmt_border_right());
+            result.push_str(&border_painter.right());
         }
-        result.push_str(&format!("{}\r\n", self.fmt_border_bottom())[..]);
+        result.push_str(&format!("{}\r\n", border_painter.bottom())[..]);
 
-        result
-    }
-
-    /**
-     * Formats the border top as a colored string.
-     */
-    pub fn fmt_border_top(self: &Banner) -> String {
-        let style = &self.style.border;
-        let mut result: String = format!(
-            "{}{}{}",
-            style.glyphs.top_left,
-            (1..self.width - 1).map(|_| style.glyphs.top).collect::<String>(),
-            style.glyphs.top_right.to_string()
-        );
-        // Apply color (if not monochrome styled)
-        if !self.style.is_monochrome {
-            result = result.color(style.color.to_string()).to_string();
-        }
-        result
-    }
-
-    /**
-     * Formats the border bottom as a colored string.
-     */
-    fn fmt_border_bottom(self: &Banner) -> String {
-        let style = &self.style.border;
-        let mut result: String = format!(
-            "{}{}{}",
-            style.glyphs.bottom_left,
-            (1..self.width - 1)
-                .map(|_| style.glyphs.bottom)
-                .collect::<String>(),
-            style.glyphs.bottom_right
-        );
-        // Apply color (if not monochrome styled)
-        if !self.style.is_monochrome {
-            result = result.color(style.color.to_string()).to_string();
-        }
-        result
-    }
-
-    /**
-     * Formats the border left-side as a colored string.
-     */
-    fn fmt_border_left(self: &Banner) -> String {
-        let style = &self.style.border;
-        let mut result: String = String::from(style.glyphs.left);
-        // Apply color (if not monochrome styled)
-        if !self.style.is_monochrome {
-            result = result.color(style.color.to_string()).to_string();
-        }
-        result
-    }
-
-    /**
-     * Formats the border right-side as a colored string.
-     */
-    fn fmt_border_right(self: &Banner) -> String {
-        let style = &self.style.border;
-        let mut result: String = String::from(style.glyphs.right);
-        // Apply color (if not monochrome styled)
-        if !self.style.is_monochrome {
-            result = result.color(style.color.to_string()).to_string();
-        }
         result
     }
 }
