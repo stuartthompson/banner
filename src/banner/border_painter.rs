@@ -130,8 +130,8 @@ mod tests {
     fn test_fmt_top_colored() {
         let mut style = default_border_style();
         style.color = Color::Red;
-        let painter: BorderPainter = BorderPainter::new(&style, true, 4);
-        let expected = format!("{}", "┌──┐");
+        let painter: BorderPainter = BorderPainter::new(&style, false, 4);
+        let expected = format!("{}", "\u{1b}[31m┌──┐\u{1b}[0m");
         assert_eq!(expected, painter.top());
     }
 
@@ -150,6 +150,16 @@ mod tests {
         let style = default_border_style();
         let painter: BorderPainter = BorderPainter::new(&style, true, 0);
         let expected = format!("{}", "");
+        assert_eq!(expected, painter.bottom());
+    }
+
+    /// Verifies that the painter renders a top border line that includes color codes.
+    #[test]
+    fn test_fmt_bottom_colored() {
+        let mut style = default_border_style();
+        style.color = Color::Red;
+        let painter: BorderPainter = BorderPainter::new(&style, false, 4);
+        let expected = format!("{}", "\u{1b}[31m└──┘\u{1b}[0m");
         assert_eq!(expected, painter.bottom());
     }
 
