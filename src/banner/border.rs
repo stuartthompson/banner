@@ -146,9 +146,9 @@ mod tests {
         let border: Border = Border::new();
         let expected = format!(
             "{}{}{}",
-            DEFAULT_TOP_LEFT_CHAR, DEFAULT_TOP_CHAR, DEFAULT_TOP_RIGHT_CHAR
+            DEFAULT_TOP_LEFT_CHAR, (0..2).map(|_| DEFAULT_TOP_CHAR).collect::<String>(), DEFAULT_TOP_RIGHT_CHAR
         )
-        .color(border.color.to_string());
+        .color(border.color.to_string()).to_string();
         assert_eq!(expected, border.fmt_top(4));
     }
 
