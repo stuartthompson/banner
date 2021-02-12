@@ -1,9 +1,9 @@
 mod content;
+mod rendering;
 mod style;
-mod border_painter;
 
 use colored::Colorize;
-use border_painter::BorderPainter;
+use rendering::BorderPainter;
 use content::{Line, TextLine};
 use style::{Style};
 

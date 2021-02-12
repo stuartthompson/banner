@@ -1,4 +1,4 @@
-use super::style::BorderStyle;
+use crate::banner::style::BorderStyle;
 use colored::Colorize;
 
 /// Represents a border painter.alloc
@@ -95,7 +95,7 @@ impl BorderPainter<'_> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::style::{BorderGlyphs, Color};
+    use crate::banner::style::{BorderGlyphs, Color};
     use super::*;
 
     /// Creates a default border style for use in unit tests.
