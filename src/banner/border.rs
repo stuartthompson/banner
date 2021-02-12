@@ -155,21 +155,25 @@ mod tests {
     #[test]
     fn test_fmt_bottom() {
         let border: Border = Border::new();
-        let expected = format!("{}", "└──┘".color(border.color.to_string()));
+        let expected = format!(
+            "{}{}{}",
+            DEFAULT_BOTTOM_LEFT_CHAR, (0..2).map(|_| DEFAULT_BOTTOM_CHAR).collect::<String>(), DEFAULT_BOTTOM_RIGHT_CHAR
+        )
+        .color(border.color.to_string()).to_string();
         assert_eq!(expected, border.fmt_bottom(4));
     }
 
     #[test]
     fn test_fmt_left() {
         let border: Border = Border::new();
-        let expected = format!("{}", "│".color(border.color.to_string()));
+        let expected = format!("{}", DEFAULT_LEFT_CHAR.to_string().color(border.color.to_string()));
         assert_eq!(expected, border.fmt_left());
     }
 
     #[test]
     fn test_fmt_right() {
         let border: Border = Border::new();
-        let expected = format!("{}", "│".color(border.color.to_string()));
+        let expected = format!("{}", DEFAULT_RIGHT_CHAR.to_string().color(border.color.to_string()));
         assert_eq!(expected, border.fmt_right());
     }
 }
