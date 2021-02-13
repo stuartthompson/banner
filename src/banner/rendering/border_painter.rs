@@ -12,7 +12,16 @@ pub struct BorderPainter<'a> {
 
 impl BorderPainter<'_> {
     /// Creates a new BorderPainter.
-    pub fn new(style: &BorderStyle, is_monochrome: bool, width: u8) -> BorderPainter {
+    ///
+    /// # Arguments
+    ///
+    /// * `style` - A description of the border style.
+    /// * `is_monochrome` - A flag indicating if this is a monochrome border.
+    /// * `width` - The width of the area the border surrounds, including the width of the border itself.
+    pub fn new(
+        style: &BorderStyle, 
+        is_monochrome: bool, 
+        width: u8) -> BorderPainter {
         BorderPainter {
             style: style,
             is_monochrome: is_monochrome,
@@ -21,6 +30,10 @@ impl BorderPainter<'_> {
     }
 
     /// Formats the border top as a colored string.
+    ///
+    /// # Arguments
+    ///
+    /// * `self` - Reference to the border painter being operated on.
     pub fn top(self: &Self) -> String {
         // Guard against width values that are too small
         if self.width < 2 {
@@ -95,8 +108,8 @@ impl BorderPainter<'_> {
 
 #[cfg(test)]
 mod tests {
-    use crate::banner::style::{BorderGlyphs, Color};
     use super::*;
+    use crate::banner::style::{BorderGlyphs, Color};
 
     /// Creates a default border style for use in unit tests.
     fn default_border_style() -> BorderStyle {

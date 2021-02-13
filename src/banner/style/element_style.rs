@@ -6,10 +6,10 @@ const DEFAULT_UNDERLINE_CHAR: char = '~';
  * Defines style information for a particular element.
  */
 pub struct ElementStyle {
-    content_color: Color,
-    is_underlined: bool,
-    underline_char: char,
-    underline_color: Color
+    pub content_color: Color,
+    pub is_underlined: bool,
+    pub underline_char: char,
+    pub underline_color: Color
 }
 
 impl ElementStyle {
@@ -17,7 +17,7 @@ impl ElementStyle {
         ElementStyle {
             content_color: Color::White,
             is_underlined: false,
-            underline_char: ' ',
+            underline_char: DEFAULT_UNDERLINE_CHAR,
             underline_color: Color::White,
         }
     }
