@@ -10,7 +10,7 @@ use style::{Style};
 pub struct Banner<'a> {
     pub width: u8,
     style: &'a Style,
-    lines: Vec<TextLine<'a>>,
+    lines: Vec<TextLine>,
 }
 
 impl<'a> Banner<'a> {
@@ -29,8 +29,8 @@ impl<'a> Banner<'a> {
     /// 
     /// * `self` - The banner to add the line of text to.
     /// * `text` - The text to add.
-    pub fn add_text_line<'b>(&'b mut self, style: &'a Style, text: String) {
-        self.lines.push(TextLine::new(&style.text, text));
+    pub fn add_text_line(&mut self, text: String) {
+        self.lines.push(TextLine::new(text));
     }
 
     /// Prints the banner.
@@ -56,7 +56,7 @@ impl<'a> Banner<'a> {
         let mut result: String;
         result = format!("{}\r\n", border_painter.top());
         for line in self.lines.iter() {
-            let l = &(*line).fmt(self.style.is_monochrome);
+            let l = &(*line).fmt(&self.style.text, self.style.is_monochrome);
             // Add left border
             result.push_str(&border_painter.left());
             // Add line content
@@ -123,7 +123,7 @@ mod tests {
         // Build the banner
         let mut banner: Banner = Banner::new(&style);
         banner.width = 16;
-        banner.add_text_line(&style, String::from("Hello!"));
+        banner.add_text_line(String::from("Hello!"));
 
         // Build the expected output
         let expected = format!(
@@ -147,8 +147,8 @@ mod tests {
         banner.width = 16;
 
         // Add multiple lines of text
-        banner.add_text_line(&style, String::from("Hello, "));
-        banner.add_text_line(&style, String::from("World!"));
+        banner.add_text_line(String::from("Hello, "));
+        banner.add_text_line(String::from("World!"));
 
         // Build the expected output
         let expected = format!(

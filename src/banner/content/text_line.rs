@@ -5,25 +5,21 @@ use super::super::style::ElementStyle;
 /// 
 /// # Arguments
 /// 
-/// * `style` - The style to apply when printing this line of text.
 /// * `text` - The text content.
-pub struct TextLine<'a> {
-    pub style: &'a ElementStyle,
+pub struct TextLine {
     pub text: String
 }
 
-impl<'a> TextLine<'a> {
+impl TextLine {
     /// Creates a new TextLine.
     /// 
     /// # Arguments
     /// 
     /// * `text` - The content of the text line.
     pub fn new(
-        style: &'a ElementStyle,
         text: String
-    ) -> TextLine<'a> {
+    ) -> TextLine {
         TextLine { 
-            style: style,
             text: text 
         }
     }
@@ -33,13 +29,13 @@ impl<'a> TextLine<'a> {
     /// # Arguments
     /// 
     /// * `self` - The text line to format.
-    pub fn fmt(self: &Self, is_monochrome: bool) -> String {
+    pub fn fmt(self: &Self, style: &ElementStyle, is_monochrome: bool) -> String {
         if is_monochrome {
             self.text.to_string()
         }
         else {
             format!("{}", 
-            self.text.color(self.style.content_color.to_string()))
+            self.text.color(style.content_color.to_string()))
         }
     }
 }
