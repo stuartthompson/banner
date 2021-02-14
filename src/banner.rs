@@ -2,7 +2,6 @@ mod content;
 mod rendering;
 mod style;
 
-use colored::Colorize;
 use rendering::BorderPainter;
 use content::{TextLine};
 use style::{Style};
