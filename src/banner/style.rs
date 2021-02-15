@@ -44,7 +44,15 @@ pub struct Style {
     pub text: ElementStyle
 }
 
+pub enum FormatLevel {
+    H1,
+    H2,
+    H3,
+    Text
+}
+
 impl Style {
+    /// Returns a new Style.
     pub fn new() -> Style {
         Style {
             no_color_codes: false,
@@ -53,6 +61,24 @@ impl Style {
             h2: ElementStyle::new(),
             h3: ElementStyle::new(),
             text: ElementStyle::new()
+        }
+    }
+
+    /// Returns the element style for a specific format level.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `self` - The parent style to retrieve the element style from.
+    /// * `level` - The format level used to identify the requested element style.
+    pub fn element_style(
+        self: &Style,
+        level: &FormatLevel
+    ) -> &ElementStyle {
+        match level {
+            H1 => &self.h1,
+            H2 => &self.h2,
+            H3 => &self.h3,
+            Text => &self.text
         }
     }
 }

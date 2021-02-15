@@ -4,12 +4,12 @@ mod style;
 
 use rendering::BorderPainter;
 use content::{Line, TextLine};
-use style::Style;
+use style::{Style, FormatLevel};
 
 pub struct Banner<'a> {
     pub width: u8,
     style: &'a Style,
-    lines: Vec<Box<dyn Line>>,
+    lines: Vec<Box<dyn Line + 'a>>,
 }
 
 impl<'a> Banner<'a> {
@@ -28,8 +28,11 @@ impl<'a> Banner<'a> {
     /// 
     /// * `self` - The banner to add the line of text to.
     /// * `text` - The text to add.
-    pub fn add_text_line(&mut self, text: String) {
-        self.lines.push(Box::new(TextLine::new(text)));
+    /// * `element_type` - The element formatting level.
+    pub fn add_text_line<'b>(&'b mut self, text: String) {
+        let tl = TextLine::new(text, &self.style.text);
+
+        self.lines.push(Box::new(tl));
     }
 
     /// Prints the banner.
@@ -55,7 +58,7 @@ impl<'a> Banner<'a> {
         let mut result: String;
         result = format!("{}\r\n", border_painter.top());
         for line in self.lines.iter() {
-            let l = &(*line).fmt(&self.style.text, self.style.no_color_codes);
+            let l = &(*line).fmt(self.style.no_color_codes);
             // Add left border
             result.push_str(&border_painter.left());
             // Add line content
