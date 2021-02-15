@@ -43,7 +43,7 @@ impl BorderPainter<'_> {
         let str: String = format!(
             "{}{}{}",
             self.style.glyphs.top_left,
-            (1..self.width - 1)
+            (0..self.width)
                 .map(|_| self.style.glyphs.top)
                 .collect::<String>(),
             self.style.glyphs.top_right.to_string()
@@ -65,7 +65,7 @@ impl BorderPainter<'_> {
         let str: String = format!(
             "{}{}{}",
             self.style.glyphs.bottom_left,
-            (1..self.width - 1)
+            (0..self.width)
                 .map(|_| self.style.glyphs.bottom)
                 .collect::<String>(),
             self.style.glyphs.bottom_right
@@ -125,7 +125,7 @@ mod tests {
     fn test_fmt_top_basic() {
         let style = default_border_style();
         let painter: BorderPainter = BorderPainter::new(&style, true, 4);
-        let expected = format!("{}", "┌──┐");
+        let expected = format!("{}", "┌────┐");
         assert_eq!(expected, painter.top());
     }
 
@@ -144,7 +144,7 @@ mod tests {
         let mut style = default_border_style();
         style.color = Color::Red;
         let painter: BorderPainter = BorderPainter::new(&style, false, 4);
-        let expected = format!("{}", "\u{1b}[31m┌──┐\u{1b}[0m");
+        let expected = format!("{}", "\u{1b}[31m┌────┐\u{1b}[0m");
         assert_eq!(expected, painter.top());
     }
 
@@ -153,7 +153,7 @@ mod tests {
     fn test_fmt_bottom_basic() {
         let style = default_border_style();
         let painter: BorderPainter = BorderPainter::new(&style, true, 4);
-        let expected = format!("{}", "└──┘");
+        let expected = format!("{}", "└────┘");
         assert_eq!(expected, painter.bottom());
     }
 
@@ -172,7 +172,7 @@ mod tests {
         let mut style = default_border_style();
         style.color = Color::Red;
         let painter: BorderPainter = BorderPainter::new(&style, false, 4);
-        let expected = format!("{}", "\u{1b}[31m└──┘\u{1b}[0m");
+        let expected = format!("{}", "\u{1b}[31m└────┘\u{1b}[0m");
         assert_eq!(expected, painter.bottom());
     }
 
