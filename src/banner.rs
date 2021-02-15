@@ -29,8 +29,8 @@ impl<'a> Banner<'a> {
     /// * `self` - The banner to add the line of text to.
     /// * `text` - The text to add.
     /// * `element_type` - The element formatting level.
-    pub fn add_text_line<'b>(&'b mut self, text: String) {
-        let tl = TextLine::new(text, &self.style.text);
+    pub fn add_text_line<'b>(&'b mut self, text: String, level: FormatLevel) {
+        let tl = TextLine::new(text, &self.style.element_style(&level));
 
         self.lines.push(Box::new(tl));
     }
@@ -126,7 +126,7 @@ mod tests {
         // Build the banner
         let mut banner: Banner = Banner::new(&style);
         banner.width = 16;
-        banner.add_text_line(String::from("Hello!"));
+        banner.add_text_line(String::from("Hello!"), FormatLevel::Text);
 
         // Build the expected output
         let expected = format!(
@@ -149,8 +149,8 @@ mod tests {
         banner.width = 16;
 
         // Add multiple lines of text
-        banner.add_text_line(String::from("Hello, "));
-        banner.add_text_line(String::from("World!"));
+        banner.add_text_line(String::from("Hello, "), FormatLevel::Text);
+        banner.add_text_line(String::from("World!"), FormatLevel::Text);
 
         // Build the expected output
         let expected = format!(

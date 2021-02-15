@@ -75,10 +75,10 @@ impl Style {
         level: &FormatLevel
     ) -> &ElementStyle {
         match level {
-            H1 => &self.h1,
-            H2 => &self.h2,
-            H3 => &self.h3,
-            Text => &self.text
+            FormatLevel::H1 => &self.h1,
+            FormatLevel::H2 => &self.h2,
+            FormatLevel::H3 => &self.h3,
+            FormatLevel::Text => &self.text
         }
     }
 }
