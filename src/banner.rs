@@ -62,6 +62,7 @@ impl<'a> Banner<'a> {
     /// # Arguments
     ///
     /// * `self` - The banner to print.
+    #[allow(dead_code)]
     fn print(self: &Banner<'a>) {
         println!("{}", self.assemble());
     }
