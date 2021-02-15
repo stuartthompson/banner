@@ -9,8 +9,8 @@ readme = "README.md"
 homepage = "https://github.com/stuartthompson/rust-banner"
 repository = "https://github.com/stuartthompson/rust-banner"
 license = "GPL-3.0-or-later"
-keywords = ["terminal", "cli", "header", "title", "console", "banners"]
-categories = ["command-line-utilities", "command-line-interface", "development-tools", "development-tools::debugging", "config"]
+keywords = ["terminal", "text", "format", "cli", "console"]
+categories = ["command-line-utilities", "command-line-interface", "development-tools", "development-tools::debugging"]
 
 [dependencies]
 colored = "1.9"
