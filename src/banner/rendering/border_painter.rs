@@ -6,7 +6,7 @@ use colored::Colorize;
 /// This is used to paint borders around banner content.
 pub struct BorderPainter<'a> {
     style: &'a BorderStyle,
-    is_monochrome: bool,
+    no_color_codes: bool,
     width: u8,
 }
 
@@ -16,15 +16,15 @@ impl BorderPainter<'_> {
     /// # Arguments
     ///
     /// * `style` - A description of the border style.
-    /// * `is_monochrome` - A flag indicating if this is a monochrome border.
+    /// * `no_color_codes` - A flag indicating whether to suppress color codes in output.
     /// * `width` - The width of the area the border surrounds, including the width of the border itself.
     pub fn new(
         style: &BorderStyle, 
-        is_monochrome: bool, 
+        no_color_codes: bool, 
         width: u8) -> BorderPainter {
         BorderPainter {
             style: style,
-            is_monochrome: is_monochrome,
+            no_color_codes: no_color_codes,
             width: width,
         }
     }
@@ -98,7 +98,7 @@ impl BorderPainter<'_> {
     /// * `self` - Reference to the border painter being operated on.
     /// * `str`  - The string to colorize.
     fn colorize(self: &Self, str: String) -> String {
-        if !self.is_monochrome {
+        if !self.no_color_codes {
             str.color(self.style.color.to_string()).to_string()
         } else {
             str

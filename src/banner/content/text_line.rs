@@ -18,8 +18,7 @@ impl<'a> Line for TextLine<'a> {
     /// # Arguments
     ///
     /// * `self` - The text line to format.
-    /// * `style` - The style to use.
-    /// * `is_monochrome` - A flag indicating whether to use color codes.
+    /// * `no_color_codes` - A flag indicating whether to suppress color codes.
     fn fmt(self: &Self, no_color_codes: bool) -> String {
         if no_color_codes {
             self.text.to_string()
@@ -30,7 +29,7 @@ impl<'a> Line for TextLine<'a> {
 }
 
 impl<'a> TextLine<'a> {
-    /// Creates a new TextLine to be displayed as a top-level heading.
+    /// Creates a new TextLine.
     ///
     /// # Arguments
     ///

@@ -2,9 +2,9 @@ mod content;
 mod rendering;
 mod style;
 
+use content::{KeyValueLine, Line, TextLine};
 use rendering::BorderPainter;
-use content::{Line, TextLine};
-use style::{Style, FormatLevel};
+use style::{HeaderLevel, Style};
 
 pub struct Banner<'a> {
     pub width: u8,
@@ -18,27 +18,49 @@ impl<'a> Banner<'a> {
         return Banner {
             width: 50,
             style: style,
-            lines: Vec::new()
+            lines: Vec::new(),
         };
+    }
+
+    /// Adds a header to the banner.
+    ///
+    /// # Arguments
+    ///
+    /// * `self` - The banner to add the line of text to.
+    /// * `text` - The text content of the header.
+    /// * `level` - The header level.
+    pub fn add_header<'b>(&'b mut self, text: String, level: HeaderLevel) {
+        let line = TextLine::new(text, &self.style.header_style(&level));
+        self.lines.push(Box::new(line));
     }
 
     /// Adds a line of text to the banner.
     ///
     /// # Arguments
-    /// 
+    ///
     /// * `self` - The banner to add the line of text to.
     /// * `text` - The text to add.
-    /// * `element_type` - The element formatting level.
-    pub fn add_text_line<'b>(&'b mut self, text: String, level: FormatLevel) {
-        let tl = TextLine::new(text, &self.style.element_style(&level));
+    pub fn add_text<'b>(&'b mut self, text: String) {
+        let line = TextLine::new(text, &self.style.text);
+        self.lines.push(Box::new(line));
+    }
 
-        self.lines.push(Box::new(tl));
+    /// Adds a line showing a key value pair to the banner.
+    ///
+    /// # Arguments
+    ///
+    /// * `self` - The banner to add the line to.
+    /// * `key` - The key name.
+    /// * `value` - The value as text.
+    pub fn add_key_value<'b>(&'b mut self, key: String, value: String) {
+        let line = KeyValueLine::new(key, value, &self.style.text);
+        self.lines.push(Box::new(line));
     }
 
     /// Prints the banner.
     ///
     /// # Arguments
-    /// 
+    ///
     /// * `self` - The banner to print.
     fn print(self: &Banner<'a>) {
         println!("{}", self.assemble());
@@ -47,13 +69,11 @@ impl<'a> Banner<'a> {
     /// Assembles the banner.
     ///
     /// # Arguments
-    /// 
+    ///
     /// * `self` - The banner to assemble.
     pub fn assemble(self: &Banner<'a>) -> String {
-        let border_painter: BorderPainter = BorderPainter::new(
-            &self.style.border, 
-            self.style.no_color_codes, 
-            self.width);
+        let border_painter: BorderPainter =
+            BorderPainter::new(&self.style.border, self.style.no_color_codes, self.width);
 
         let mut result: String;
         result = format!("{}\r\n", border_painter.top());
@@ -81,38 +101,55 @@ impl<'a> Banner<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::style::Color;
+    use super::*;
 
-    /// Verifies that a default, empty banner is assembled correctly.
+    // #region Tests for color code suppression
+
+    /// Tests that an banner can be rendered without color codes.
     #[test]
-    fn test_assemble_empty() {
-        // Create a style
+    fn test_assemble_empty_no_color_codes() {
+        // Create a style with suppressed color codes
         let mut style: Style = Style::new();
         style.no_color_codes = true;
 
         let mut banner: Banner = Banner::new(&style);
         banner.width = 4;
-        let expected = format!(
-            "{}",
-            "┌──┐\r\n└──┘\r\n"
-        );
+        assert_eq!("┌──┐\r\n└──┘\r\n", banner.assemble());
+    }
+
+    #[test]
+    fn test_assemble_banner_no_color_codes() {
+        // Create a style with suppressed color codes
+        let mut style: Style = Style::new();
+        style.no_color_codes = true;
+
+        let mut banner: Banner = Banner::new(&style);
+        banner.width = 12;
+        banner.add_header(String::from("Header h1"), HeaderLevel::H1);
+        banner.add_header(String::from("Header h2"), HeaderLevel::H2);
+        banner.add_header(String::from("Header h3"), HeaderLevel::H3);
+        banner.add_text(String::from("Text"));
+        banner.add_key_value(String::from("Key"), String::from("Val"));
+
+        let expected = "┌──────────┐\r\n│Header h1 ││Header h2 ││Header h3 ││Text      ││Key: Val  │└──────────┘\r\n";
         assert_eq!(expected, banner.assemble());
     }
 
-    /// Verifies that a default, empty banner with color codes is assembled correctly.
+    // #endregion
+
+    /// Tests that an empty banner is assembled correctly.
     #[test]
-    fn test_assemble_empty_colored() {
+    fn test_assemble_empty() {
         // Create a style
         let mut style: Style = Style::new();
         style.border.color = Color::White;
 
+        // Build the banner
         let mut banner: Banner = Banner::new(&style);
         banner.width = 4;
-        let expected = format!(
-            "{}",
-            "\u{1b}[37m┌──┐\u{1b}[0m\r\n\u{1b}[37m└──┘\u{1b}[0m\r\n"
-        );
+
+        let expected = "\u{1b}[37m┌──┐\u{1b}[0m\r\n\u{1b}[37m└──┘\u{1b}[0m\r\n";
         assert_eq!(expected, banner.assemble());
     }
 
@@ -126,13 +163,9 @@ mod tests {
         // Build the banner
         let mut banner: Banner = Banner::new(&style);
         banner.width = 16;
-        banner.add_text_line(String::from("Hello!"), FormatLevel::Text);
+        banner.add_text(String::from("Hello!"));
 
-        // Build the expected output
-        let expected = format!(
-            "{}", "┌──────────────┐\r\n│Hello!        │└──────────────┘\r\n"
-        );
-
+        let expected = "┌──────────────┐\r\n│Hello!        │└──────────────┘\r\n";
         assert_eq!(expected, banner.assemble());
     }
 
@@ -149,14 +182,13 @@ mod tests {
         banner.width = 16;
 
         // Add multiple lines of text
-        banner.add_text_line(String::from("Hello, "), FormatLevel::Text);
-        banner.add_text_line(String::from("World!"), FormatLevel::Text);
+        banner.add_text(String::from("Hello, "));
+        banner.add_text(String::from("World!"));
 
-        // Build the expected output
-        let expected = format!(
-            "{}", "\u{1b}[37m┌──────────────┐\u{1b}[0m\r\n\u{1b}[37m│\u{1b}[0m\u{1b}[31mHello, \u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[31mWorld!\u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[37m└──────────────┘\u{1b}[0m\r\n"
-        );
-
+        let expected = "\u{1b}[37m┌──────────────┐\u{1b}[0m\r\n\u{1b}[37m│\u{1b}[0m\u{1b}[31mHello, \u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[31mWorld!\u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[37m└──────────────┘\u{1b}[0m\r\n";
         assert_eq!(expected, banner.assemble());
     }
+
+    #[test]
+    fn test_assemble_keyvalue_simple() {}
 }

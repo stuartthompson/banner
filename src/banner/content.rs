@@ -1,9 +1,17 @@
 mod text_line;
+mod key_value_line;
 
 // Re-exports
 pub use text_line::TextLine;
+pub use key_value_line::KeyValueLine;
 
-/// Line traits render a line of content within a banner.
+/// Lines render a line of text within a banner.
 pub trait Line {
-    fn fmt(self: &Self, is_monochrome: bool) -> String;
+    /// Formats the line.
+    ///
+    /// # Arguments
+    ///
+    /// * `self` - The line to format.
+    /// * `no_color_codes` - A flag indicating whether to suppress color codes.
+    fn fmt(self: &Self, no_color_codes: bool) -> String;
 }

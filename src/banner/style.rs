@@ -44,11 +44,10 @@ pub struct Style {
     pub text: ElementStyle
 }
 
-pub enum FormatLevel {
+pub enum HeaderLevel {
     H1,
     H2,
-    H3,
-    Text
+    H3
 }
 
 impl Style {
@@ -64,21 +63,20 @@ impl Style {
         }
     }
 
-    /// Returns the element style for a specific format level.
+    /// Returns the element style for a header level.
     /// 
     /// # Arguments
     /// 
     /// * `self` - The parent style to retrieve the element style from.
-    /// * `level` - The format level used to identify the requested element style.
-    pub fn element_style(
+    /// * `level` - The header level used to identify the requested element style.
+    pub fn header_style(
         self: &Style,
-        level: &FormatLevel
+        level: &HeaderLevel
     ) -> &ElementStyle {
         match level {
-            FormatLevel::H1 => &self.h1,
-            FormatLevel::H2 => &self.h2,
-            FormatLevel::H3 => &self.h3,
-            FormatLevel::Text => &self.text
+            HeaderLevel::H1 => &self.h1,
+            HeaderLevel::H2 => &self.h2,
+            HeaderLevel::H3 => &self.h3
         }
     }
 }
