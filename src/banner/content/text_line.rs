@@ -8,7 +8,7 @@ use colored::Colorize;
 ///
 /// * `text` - The text content.
 pub struct TextLine<'a> {
-    pub text: String,
+    pub text: &'a str,
     pub style: &'a ElementStyle,
 }
 
@@ -35,7 +35,7 @@ impl<'a> TextLine<'a> {
     ///
     /// * `text` - The content of the text line.
     /// * `level` - The formatting level of the new text line.
-    pub fn new(text: String, style: &'a ElementStyle) -> TextLine<'a> {
+    pub fn new(text: &'a str, style: &'a ElementStyle) -> TextLine<'a> {
         TextLine { text, style }
     }
 }

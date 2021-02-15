@@ -9,8 +9,8 @@ use colored::Colorize;
 /// * `key` - The key name.
 /// * `value` - The value as text.
 pub struct KeyValueLine<'a> {
-    pub key: String,
-    pub value: String,
+    pub key: &'a str,
+    pub value: &'a str,
     pub style: &'a ElementStyle,
 }
 
@@ -40,7 +40,7 @@ impl<'a> KeyValueLine<'a> {
     /// * `key` - The key name.
     /// * `value` - The value as text.
     /// * `style` - The element style to apply when formatting this line.
-    pub fn new(key: String, value: String, style: &'a ElementStyle) -> KeyValueLine<'a> {
+    pub fn new(key: &'a str, value: &'a str, style: &'a ElementStyle) -> KeyValueLine<'a> {
         KeyValueLine { key, value, style }
     }
 }
