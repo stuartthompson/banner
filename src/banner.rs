@@ -189,7 +189,4 @@ mod tests {
         let expected = "\u{1b}[37m┌──────────────┐\u{1b}[0m\r\n\u{1b}[37m│\u{1b}[0m\u{1b}[31mHello, \u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[31mWorld!\u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[37m└──────────────┘\u{1b}[0m\r\n";
         assert_eq!(expected, banner.assemble());
     }
-
-    #[test]
-    fn test_assemble_keyvalue_simple() {}
 }
