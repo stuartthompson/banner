@@ -3,13 +3,13 @@ mod rendering;
 mod style;
 
 use rendering::BorderPainter;
-use content::{TextLine};
-use style::{Style};
+use content::{Line, TextLine};
+use style::Style;
 
 pub struct Banner<'a> {
     pub width: u8,
     style: &'a Style,
-    lines: Vec<TextLine>,
+    lines: Vec<Box<dyn Line>>,
 }
 
 impl<'a> Banner<'a> {
@@ -29,7 +29,7 @@ impl<'a> Banner<'a> {
     /// * `self` - The banner to add the line of text to.
     /// * `text` - The text to add.
     pub fn add_text_line(&mut self, text: String) {
-        self.lines.push(TextLine::new(text));
+        self.lines.push(Box::new(TextLine::new(text)));
     }
 
     /// Prints the banner.
@@ -49,13 +49,13 @@ impl<'a> Banner<'a> {
     pub fn assemble(self: &Banner<'a>) -> String {
         let border_painter: BorderPainter = BorderPainter::new(
             &self.style.border, 
-            self.style.is_monochrome, 
+            self.style.no_color_codes, 
             self.width);
 
         let mut result: String;
         result = format!("{}\r\n", border_painter.top());
         for line in self.lines.iter() {
-            let l = &(*line).fmt(&self.style.text, self.style.is_monochrome);
+            let l = &(*line).fmt(&self.style.text, self.style.no_color_codes);
             // Add left border
             result.push_str(&border_painter.left());
             // Add line content
@@ -85,7 +85,8 @@ mod tests {
     #[test]
     fn test_assemble_empty() {
         // Create a style
-        let style: Style = Style::new();
+        let mut style: Style = Style::new();
+        style.no_color_codes = true;
 
         let mut banner: Banner = Banner::new(&style);
         banner.width = 4;
@@ -101,7 +102,6 @@ mod tests {
     fn test_assemble_empty_colored() {
         // Create a style
         let mut style: Style = Style::new();
-        style.is_monochrome = false;
         style.border.color = Color::White;
 
         let mut banner: Banner = Banner::new(&style);
@@ -117,7 +117,8 @@ mod tests {
     #[test]
     fn test_assemble_simple() {
         // Create a style
-        let style: Style = Style::new();
+        let mut style: Style = Style::new();
+        style.no_color_codes = true;
 
         // Build the banner
         let mut banner: Banner = Banner::new(&style);
@@ -137,7 +138,6 @@ mod tests {
     fn test_assemble_simple_colored() {
         // Create a style
         let mut style: Style = Style::new();
-        style.is_monochrome = false;
         style.border.color = Color::White;
         style.text.content_color = Color::Red;
 

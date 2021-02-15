@@ -13,10 +13,10 @@ pub use element_style::ElementStyle;
  */
 pub struct Style {
     /**
-     * Flag indicating if this style prints a monochrome banner.
-     * Setting this flag to true will ignore all color code information in this style.
+     * Used to suppress color codes.
+     * Setting this flag to true will omit color codes from output.
      */
-    pub is_monochrome: bool,
+    pub no_color_codes: bool,
 
     /**
      * The border color.
@@ -47,7 +47,7 @@ pub struct Style {
 impl Style {
     pub fn new() -> Style {
         Style {
-            is_monochrome: true,
+            no_color_codes: false,
             border: BorderStyle::new(),
             h1: ElementStyle::new(),
             h2: ElementStyle::new(),
