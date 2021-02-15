@@ -4,10 +4,11 @@ mod style;
 
 use content::{KeyValueLine, Line, TextLine};
 use rendering::BorderPainter;
-pub use style::{HeaderLevel, Style};
+pub use style::{HeaderLevel, Style, Color};
 
 pub struct Banner<'a> {
     pub width: u8,
+    pub auto_widen: bool,
     style: &'a Style,
     lines: Vec<Box<dyn Line + 'a>>,
 }
@@ -17,6 +18,7 @@ impl<'a> Banner<'a> {
     pub fn new(style: &'a Style) -> Banner<'a> {
         return Banner {
             width: 50,
+            auto_widen: true,
             style: style,
             lines: Vec::new(),
         };
@@ -31,6 +33,13 @@ impl<'a> Banner<'a> {
     /// * `level` - The header level.
     pub fn add_header<'b>(&'b mut self, text: &'a str, level: HeaderLevel) {
         let line = TextLine::new(text, &self.style.header_style(&level));
+
+        // Check if banner needs to be widened
+        let line_width = line.width();
+        if self.auto_widen && line_width > self.width {
+            self.width = line_width
+        }
+
         self.lines.push(Box::new(line));
     }
 
@@ -55,16 +64,6 @@ impl<'a> Banner<'a> {
     pub fn add_key_value<'b>(&'b mut self, key: &'a str, value: &'a str) {
         let line = KeyValueLine::new(key, value, &self.style.text);
         self.lines.push(Box::new(line));
-    }
-
-    /// Prints the banner.
-    ///
-    /// # Arguments
-    ///
-    /// * `self` - The banner to print.
-    #[allow(dead_code)]
-    fn print(self: &Banner<'a>) {
-        println!("{}", self.assemble());
     }
 
     /// Assembles the banner.
@@ -93,6 +92,7 @@ impl<'a> Banner<'a> {
             ));
             // Add right border
             result.push_str(&border_painter.right());
+            result.push_str("\r\n");
         }
         result.push_str(&format!("{}\r\n", border_painter.bottom())[..]);
 
@@ -133,7 +133,7 @@ mod tests {
         banner.add_text("Text");
         banner.add_key_value("Key", "Val");
 
-        let expected = "┌──────────┐\r\n│Header h1 ││Header h2 ││Header h3 ││Text      ││Key: Val  │└──────────┘\r\n";
+        let expected = "┌──────────┐\r\n│Header h1 │\r\n│Header h2 │\r\n│Header h3 │\r\n│Text      │\r\n│Key: Val  │\r\n└──────────┘\r\n";
         assert_eq!(expected, banner.assemble());
     }
 
@@ -166,7 +166,7 @@ mod tests {
         banner.width = 16;
         banner.add_text("Hello!");
 
-        let expected = "┌──────────────┐\r\n│Hello!        │└──────────────┘\r\n";
+        let expected = "┌──────────────┐\r\n│Hello!        │\r\n└──────────────┘\r\n";
         assert_eq!(expected, banner.assemble());
     }
 
@@ -186,7 +186,7 @@ mod tests {
         banner.add_text("Hello, ");
         banner.add_text("World!");
 
-        let expected = "\u{1b}[37m┌──────────────┐\u{1b}[0m\r\n\u{1b}[37m│\u{1b}[0m\u{1b}[31mHello, \u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[31mWorld!\u{1b}[0m\u{1b}[37m│\u{1b}[0m\u{1b}[37m└──────────────┘\u{1b}[0m\r\n";
+        let expected = "\u{1b}[37m┌──────────────┐\u{1b}[0m\r\n\u{1b}[37m│\u{1b}[0m\u{1b}[31mHello, \u{1b}[0m\u{1b}[37m│\u{1b}[0m\r\n\u{1b}[37m│\u{1b}[0m\u{1b}[31mWorld!\u{1b}[0m\u{1b}[37m│\u{1b}[0m\r\n\u{1b}[37m└──────────────┘\u{1b}[0m\r\n";
         assert_eq!(expected, banner.assemble());
     }
 }

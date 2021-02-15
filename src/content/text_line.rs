@@ -26,6 +26,11 @@ impl<'a> Line for TextLine<'a> {
             self.text.color(self.style.content_color.to_string()).to_string()
         }
     }
+
+    /// Returns the width of the line when rendered.
+    fn width(self: &Self) -> u8 {
+        self.text.chars().count() as u8
+    }
 }
 
 impl<'a> TextLine<'a> {

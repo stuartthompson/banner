@@ -30,6 +30,11 @@ impl<'a> Line for KeyValueLine<'a> {
             result.color(self.style.content_color.to_string()).to_string()
         }
     }
+
+    /// Returns the width of the line when rendered.
+    fn width(self: &Self) -> u8 {
+        (self.key.chars().count() + 2 + self.value.chars().count()) as u8
+    }
 }
 
 impl<'a> KeyValueLine<'a> {
