@@ -1,6 +1,6 @@
 [package]
 name = "banner"
-version = "0.1.0"
+version = "0.0.1"
 authors = ["Stuart Thompson <stuart@stuartthompson.net>"]
 edition = "2018"
 description = "Writes banners (title panels and headers) to the console to help make console output prettier."
